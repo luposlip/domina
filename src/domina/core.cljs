@@ -1,13 +1,9 @@
 (ns domina.core
-  (:require
-   [goog.dom :as dom]
-            [goog.dom.xml :as xml]
+  (:require [goog.dom :as dom]
             [goog.dom.classes :as classes]
             [goog.dom.forms :as forms]
-            [goog.events :as events]
             [goog.style :as style]
             [goog.string :as string]
-            [cljs.core :as core]
             [clojure.string :as cstring]
             [domina.support :as support])
   (:refer-clojure :exclude [clone])
@@ -120,14 +116,14 @@
 (defn by-id
   "Returns content containing a single node by looking up the given ID"
   [id]
-  (dom/getElement (core/name id)))
+  (dom/getElement (name id)))
 
 (declare normalize-seq)
 
 (defn by-class
   "Returns content containing nodes which have the specified CSS class."
   [class-name]
-  (normalize-seq (dom/getElementsByClass (core/name class-name))))
+  (normalize-seq (dom/getElementsByClass (name class-name))))
 
 (defn children
   "Gets all the child nodes of the elements in a content. Same as (xpath content '*') but more efficient."
@@ -210,34 +206,34 @@
 
 (defn style
   "Gets the value of a CSS property. Assumes content will be a single node. Name may be a string or keyword. Returns nil if there is no value set for the style."
-  [content name]
-  (let [s (style/getStyle (single-node content) (core/name name))]
+  [content the-name]
+  (let [s (style/getStyle (single-node content) (name the-name))]
     (when-not (cstring/blank? s) s)))
 
 (defn attr
   "Gets the value of an HTML attribute. Assumes content will be a single node. Name may be a stirng or keyword. Returns nil if there is no value set for the style."
-  [content name]
-  (.getAttribute (single-node content) (core/name name)))
+  [content the-name]
+  (.getAttribute (single-node content) (name the-name)))
 
 (defn set-style!
   "Sets the value of a CSS property for each node in the content. Name may be a string or keyword. Value will be cast to a string, multiple values wil be concatenated."
-  [content name & value]
+  [content the-name & value]
   (doseq [n (nodes content)]
-    (style/setStyle n (core/name name) (apply str value)))
+    (style/setStyle n (name the-name) (apply str value)))
   content)
 
 (defn set-attr!
   "Sets the value of an HTML property for each node in the content. Name may be a string or keyword. Value will be cast to a string, multiple values wil be concatenated."
-  [content name & value]
+  [content the-name & value]
   (doseq [n (nodes content)]
-    (.setAttribute n (core/name name) (apply str value)))
+    (.setAttribute n (name the-name) (apply str value)))
   content)
 
 (defn remove-attr!
   "Removes the specified HTML property for each node in the content. Name may be a string or keyword."
-  [content name]
+  [content the-name]
   (doseq [n (nodes content)]
-    (.removeAttribute n (core/name name)))
+    (.removeAttribute n (name the-name)))
   content)
 
 ;; We don't use the existing style/parseStyleAttributes because it camelcases everything.
@@ -282,15 +278,15 @@
 (defn set-styles!
   "Sets the specified CSS styles for each node in the content, given a map of names and values. Style names may be keywords or strings."
   [content styles]
-  (doseq [[name value] styles]
-    (set-style! content name value))
+  (doseq [[the-name value] styles]
+    (set-style! content the-name value))
   content)
 
 (defn set-attrs!
   "Sets the specified attributes for each node in the content, given a map of names and values. Names may be a string or keyword. Values will be cast to a string, multiple values wil be concatenated."
   [content attrs]
-  (doseq [[name value] attrs]
-    (set-attr! content name value))
+  (doseq [[the-name value] attrs]
+    (set-attr! content the-name value))
   content)
 
 (defn has-class?
@@ -486,7 +482,7 @@
    (nil? list-thing) '()
    (satisfies? ISeqable list-thing) (seq list-thing)
    (array-like? list-thing) (lazy-nodelist list-thing)
-   :default (seq [list-thing])))
+   :else (seq [list-thing])))
 
 ;;;;;;;;;;;;;;;;;;; Protocol Implementations ;;;;;;;;;;;;;;;;;
 
@@ -505,15 +501,15 @@
      (nil? content) '()
      (satisfies? ISeqable content) (seq content)
      (array-like? content) (lazy-nodelist content)
-     :default (seq [content])))
+     :else (seq [content])))
   (single-node [content]
     (cond
      (nil? content) nil
      (satisfies? ISeqable content) (first content)
      (array-like? content) (. content (item 0))
-     :default content)))
+     :else content)))
 
-(if (dm/defined? js/NodeList)
+(when (dm/defined? js/NodeList)
   (extend-type js/NodeList
     ICounted
     (-count [nodelist] (. nodelist -length))
@@ -526,23 +522,22 @@
     ISeqable
     (-seq [nodelist] (lazy-nodelist nodelist))))
 
-(if (dm/defined? js/StaticNodeList)
-  (do
-    (extend-type js/StaticNodeList
-      ICounted
-      (-count [nodelist] (. nodelist -length))
+(when (dm/defined? js/StaticNodeList)
+  (extend-type js/StaticNodeList
+    ICounted
+    (-count [nodelist] (. nodelist -length))
 
-      IIndexed
-      (-nth
-       ([nodelist n] (. nodelist (item n)))
-       ([nodelist n not-found] (if (<= (. nodelist -length) n)
-                                 not-found
-                                 (nth nodelist n))))
+    IIndexed
+    (-nth
+      ([nodelist n] (. nodelist (item n)))
+      ([nodelist n not-found] (if (<= (. nodelist -length) n)
+                                not-found
+                                (nth nodelist n))))
 
-      ISeqable
-      (-seq [nodelist] (lazy-nodelist nodelist)))))
+    ISeqable
+    (-seq [nodelist] (lazy-nodelist nodelist))))
 
-(if (dm/defined? js/HTMLCollection)
+(when (dm/defined? js/HTMLCollection)
   (extend-type js/HTMLCollection
     ICounted
     (-count [coll] (. coll -length))
