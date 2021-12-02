@@ -1,12 +1,19 @@
+# Newest
+
 # What is Domina?
 
-Domina is a jQuery inspired DOM manipulation library for ClojureScript. It provides a functional, idiomatic Clojure interface to the DOM manipulation facilities provided by the Google Closure library.
+Domina is an early (in ClojureScript terms) jQuery inspired DOM manipulation library for ClojureScript. It provides a functional, idiomatic Clojure interface to the DOM manipulation facilities provided by the Google Closure library.
+
+It was made by Luke Vanderhart, and the original repository can be found here:
+https://github.com/levand/domina
+
+I've made this fork, because modern ClojureScript (1.10.879) doesn't work with the original `domina`, and I need it to work while I refactor a big full stack Clojure/ClojureScript project to something else (React, Reagent or perhaps htmx).
 
 **Warning**: Domina is still beta-level software. Everything *should*  work, but there may still be bugs, browser incompatibility or performance issues. Please report them!
 
 Pull requests are extremely welcome.
 
-You can obtain Domina by pulling from Clojars: `[domina "1.0.3"]`.
+You can obtain Domina by pulling from Clojars: `[com.luposlip/domina "1.0.4"]`.
 
 ## Rationale
 
@@ -46,28 +53,8 @@ The `xpath` function also takes an optional first argument (which can be any `Do
     (xpath "span"))
 ```
 
-The `sel` function in the `domina.css` namespace works the same way for CSS selectors:
-
-```clojure
-(sel ".my-class")
-```
-
-```clojure
-(sel "#my-id")
-```
-
-```clojure
-(-> (sel "body")
-    (sel "div")
-    (sel "p")
-    (sel "span"))
-```
-
-```clojure
-(sel "body > div > p > span")
-```
-
-Other selector functions include the core functions `by-id` and `by-class` which return a `DomContent` based on node id and node class, respectively.
+**NB** (@luposlip) `domina.css` has been deprecated, since it works differently with newer versions of Google Closure. The new API:
+https://google.github.io/closure-library/api/goog.dom.html
 
 ## Examples
 
@@ -80,7 +67,7 @@ Append a `<div>` to the body element:
 Move a `<div>` from the end of the document to the beginning:
 
 ```clojure
-(prepend! (xpath "//body") 
+(prepend! (xpath "//body")
          (detach! (xpath "//body/div[last()]")))
 ```
 

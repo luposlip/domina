@@ -1,4 +1,4 @@
-(ns domina
+(ns domina.core
   (:require
    [goog.dom :as dom]
             [goog.dom.xml :as xml]
@@ -99,8 +99,8 @@
 
 ;; These are to silence a bug where the compiler emits a warning when
 ;; it hits the defprotocol for DomContent.
-(declare nodes)
-(declare single-node)
+;;(declare nodes)
+;;(declare single-node)
 
 (defprotocol DomContent
   (nodes [content] "Returns the content as a sequence of nodes.")
@@ -108,7 +108,7 @@
 
 ;;;;;;;;;;;;;;;;;;; Public API ;;;;;;;;;;;;;;;;;
 
-(def *debug* true)
+(def ^:dynamic *debug* true)
 (defn log-debug [& mesg]
   (when (and *debug* (not (= (.-console js/window) js/undefined)))
     (.log js/console (apply str  mesg))))

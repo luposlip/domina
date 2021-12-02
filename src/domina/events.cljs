@@ -1,6 +1,5 @@
-
 (ns domina.events
-  (:require [domina :as domina]
+  (:require [domina.core :as domina]
             [goog.object :as gobj]
             [goog.events :as events]))
 
@@ -55,44 +54,44 @@
   "Add an event listener to each node in a DomContent. Listens for events during the bubble phase. Returns a sequence of listener keys (one for each item in the content). If content is omitted, binds a listener to the document's root element."
   ([type listener] (listen! root-element type listener))
   ([content type listener]
-     (listen-internal! content type listener false false)))
+   (listen-internal! content type listener false false)))
 
 (defn capture!
   "Add an event listener to each node in a DomContent. Listens for events during the capture phase.  Returns a sequence of listener keys (one for each item in the content). If content is omitted, binds a listener to the document's root element."
   ([type listener] (capture! root-element type listener))
   ([content type listener]
-     (listen-internal! content type listener true false)))
+   (listen-internal! content type listener true false)))
 
 (defn listen-once!
   "Add an event listener to each node in a DomContent. Listens for events during the bubble phase. De-registers the listener after the first time it is invoked.  Returns a sequence of listener keys (one for each item in the content). If content is omitted, binds a listener to the document's root element."
   ([type listener] (listen-once! root-element type listener))
   ([content type listener]
-     (listen-internal! content type listener false true)))
+   (listen-internal! content type listener false true)))
 
 (defn capture-once!
   "Add an event listener to each node in a DomContent. Listens for events during the capture phase. De-registers the listener after the first time it is invoked.  Returns a sequence of listener keys (one for each item in the content). If content is omitted, binds a listener to the document's root element."
   ([type listener] (capture-once! root-element type listener))
   ([content type listener]
-     (listen-internal! content type listener true true)))
+   (listen-internal! content type listener true true)))
 
 (defn unlisten!
   "Removes event listeners from each node in the content. If a listener type is supplied, removes only listeners of that type. If content is omitted, it will remove listeners from the document's root element."
   ([] (unlisten! root-element))
   ([content]
-     (doseq [node (domina/nodes content)]
-       (events/removeAll node)))
+   (doseq [node (domina/nodes content)]
+     (events/removeAll node)))
   ([content type]
-     (let [type (name type)]
-       (doseq [node (domina/nodes content)]
-         (events/removeAll node type)))))
+   (let [type (name type)]
+     (doseq [node (domina/nodes content)]
+       (events/removeAll node type)))))
 
 (defn- ancestor-nodes
   "Returns a seq of a node and its ancestors, starting with the document root."
   ([n] (ancestor-nodes n [n]))
   ([n so-far]
-     (if-let [parent (.-parentNode n)]
-       (recur parent (cons parent so-far))
-       so-far)))
+   (if-let [parent (.-parentNode n)]
+     (recur parent (cons parent so-far))
+     so-far)))
 
 ;; See closure.goog.testing.events.fireBrowserEvent. This function will give us the same
 ;; bubbling/capturing functionality as W3C DOM level 2 events, on native browser nodes,
@@ -129,11 +128,11 @@
   "Dispatches an event of the given type, adding the values in event map to the event object. Optionally takes an event source. If none is provided, dispatches on the document's root element. Returns false if any handlers called prevent-default, otherwise true."
   ([type evt-map] (dispatch! root-element type evt-map))
   ([source type evt-map]
-     (let [evt (events/Event. (name type))]
-       (doseq [[k v] evt-map] (aset evt k v))
-       (if (is-event-target? source)
-         (dispatch-event-target! source evt)
-         (dispatch-browser! source evt)))))
+   (let [evt (goog.events.Event. (name type))]
+     (doseq [[k v] evt-map] (aset evt k v))
+     (if (is-event-target? source)
+       (dispatch-event-target! source evt)
+       (dispatch-browser! source evt)))))
 
 (defn unlisten-by-key!
   "Given a listener key, removes the listener."
@@ -142,7 +141,7 @@
 
 (defn get-listeners
   "Returns a sequence of event listeners for all the nodes in the
-content of a given type."
+  content of a given type."
   [content type]
   (let [type (name type)]
     (mapcat #(events/getListeners % type false) (domina/nodes content))))
