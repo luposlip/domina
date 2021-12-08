@@ -1,19 +1,19 @@
-# Newest
+# What is this fork?
+
+You can this fork of Domina by pulling from Clojars: `[com.luposlip/domina "1.0.4"]`.
+
+I've made this fork, because modern ClojureScript (1.10.879) doesn't work with the original `domina` primarily because of it's single segment namespace. And I need it to work while I rewrite the UI for a big fullstack Clojure/ClojureScript project to something else (React, Reagent or perhaps htmx).
+
+It was made by Luke Vanderhart, and the original repository can be found here:
+https://github.com/levand/domina
 
 # What is Domina?
 
 Domina is an early (in ClojureScript terms) jQuery inspired DOM manipulation library for ClojureScript. It provides a functional, idiomatic Clojure interface to the DOM manipulation facilities provided by the Google Closure library.
 
-It was made by Luke Vanderhart, and the original repository can be found here:
-https://github.com/levand/domina
-
-I've made this fork, because modern ClojureScript (1.10.879) doesn't work with the original `domina`, and I need it to work while I refactor a big full stack Clojure/ClojureScript project to something else (React, Reagent or perhaps htmx).
-
 **Warning**: Domina is still beta-level software. Everything *should*  work, but there may still be bugs, browser incompatibility or performance issues. Please report them!
 
 Pull requests are extremely welcome.
-
-You can obtain Domina by pulling from Clojars: `[com.luposlip/domina "1.0.4"]`.
 
 ## Rationale
 
